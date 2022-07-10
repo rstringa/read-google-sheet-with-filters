@@ -77,7 +77,7 @@
 
                 /* Borrar todas las filas excepto la cabecera de la tabla */
                 while (output.rows.length > 1) {
-                    output.deleteRow(1);
+                   // output.deleteRow(1);
                 }
 
                 let count = 0;
@@ -91,6 +91,7 @@
                         data.table.rows.forEach((main) => {
                             const container = document.createElement('tr');
                             output.append(container);
+
                             main.c.forEach((ele) => {
                                 const cantidadColumnas = main.c.length;
                                 const cell = document.createElement('td');
