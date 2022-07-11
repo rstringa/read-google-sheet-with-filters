@@ -68,12 +68,19 @@
 
                 const base = 'https://docs.google.com/spreadsheets/d/1U-zgC_zKCmsCIdWBz7YDKCmRZbHGw7_DdUhmKvI5s9A/gviz/tq?';
                 const output = document.querySelector('.output');
-
+                
                /* Borrar todas las filas excepto la cabecera de la tabla*/                    
-               if ( paisElegido != "Todos" || ciudadElegida != "Todos") {             
+               if ( paisElegido == "Todos"  ) {             
+                   $(".output tr").remove();
+                  // console.log ( 1 )
+                }
+                if ( ciudadElegida == "Todos" ) {             
                     $(".output tr:not(:first)").remove();
-                } else {
-                    $(".output tr").remove();
+                   // console.log ( 2 )
+                }
+                if ( paisElegido != "Todos" &&  ciudadElegida != "Todos" ) {
+                    $(".output tr:not(:first)").remove();
+                  //  console.log ( 3 )
                 }
                
                let countingCeldas = 0;
@@ -90,11 +97,14 @@
                             output.append(container);
                             main.c.forEach((ele) => {
                                 const cantidadColumnas = main.c.length;
+                                
                                 const cell = document.createElement('td');
                                 countingCeldas++;
-
+                               // console.log( cantidadColumnas + "-" + countingCeldas ); 
+                                
                                 /* Si es la celda de imagen y no es la cabecera de la tabla */
                                 if ( countingCeldas % cantidadColumnas == 0 && countingCeldas > cantidadColumnas ) {
+                                  
                                     if (ele.v !== null) {
                                         cell.innerHTML = "<img src=" + ele.v + ">";
                                     }
@@ -162,13 +172,13 @@
             //
             ciudad.addEventListener('change', function (event) {
                 let ciudadElegida = event.target.value;
-                let paisSeleccionado = document.querySelector("#pais").value;
+                let paisElegido = document.querySelector("#pais").value;
                 if (ciudadElegida != "Todos") {
                     query = encodeURIComponent(`Select * where B = "${ciudadElegida}" `);
                 } else {
-                    query = encodeURIComponent(`Select * where A = "${paisSeleccionado}"`);
+                    query = encodeURIComponent(`Select * where A = "${paisElegido}"`);
                 }
-                fetchFunction(query, ciudadElegida);
+                fetchFunction(query, paisElegido, ciudadElegida);
             })
 
 
