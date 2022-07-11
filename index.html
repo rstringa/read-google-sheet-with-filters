@@ -23,27 +23,21 @@
             <span class="badge badge-primary">Bootstrap</span>
             <span class="badge badge-warning">Ajax</span>
         </p>
-
-        <div class="form" id="filtros">
-
-            <div class="form-row">
-                <div class="col-6 col-md-3">
-                    <select id="pais" class="form-control form-control-md">
-                        <option value="Todos">Todos los Paises</option>
-                        <option value="Argentina">Argentina</option>
-                        <option value="Brasil">Brasil</option>
-                        <option value="Chile">Chile</option>
-                    </select>
-                </div>
-                <div class="col-6 col-md-3">
-                    <select id="ciudad" class="form-control form-control-md">
-                        <option value="Todos">Todas las ciudades</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-        <table class="table output"></table>
+    <div class="form" id="filtros">
+        <div class="form-row">
+        <select id="pais" class="col-6 col-md-3 form-control form-control-md">
+            <option value="Todos">Todos los Paises</option>
+            <option value="Argentina">Argentina</option>
+            <option value="Brasil">Brasil</option>
+            <option value="Chile">Chile</option>
+        </select>
+        <select id="ciudad" class="col-6 col-md-3 form-control form-control-md">
+            <option value="Todos">Todas las ciudades</option>
+        </select>
     </div>
+    </div>
+    <table class="table output"></table>
+
     <style>
         tr:first-of-type {
             font-weight: bold;
@@ -75,30 +69,32 @@
                 const base = 'https://docs.google.com/spreadsheets/d/1U-zgC_zKCmsCIdWBz7YDKCmRZbHGw7_DdUhmKvI5s9A/gviz/tq?';
                 const output = document.querySelector('.output');
 
-                /* Borrar todas las filas excepto la cabecera de la tabla */
-                while (output.rows.length > 1) {
-                   // output.deleteRow(1);
+               /* Borrar todas las filas excepto la cabecera de la tabla*/                    
+               if ( paisElegido != "Todos" || ciudadElegida != "Todos") {             
+                    $(".output tr:not(:first)").remove();
+                } else {
+                    $(".output tr").remove();
                 }
-
-                let count = 0;
-                /* Generar la url del Fetch */
-
+               
+               let countingCeldas = 0;
+               /* Generar la url del Fetch */
+  
                 const url = base + '&tq=' + query;
                 fetch(url)
                     .then(res => res.text())
                     .then(rep => {
                         const data = JSON.parse(rep.substr(47).slice(0, -2));
+
                         data.table.rows.forEach((main) => {
                             const container = document.createElement('tr');
                             output.append(container);
-
                             main.c.forEach((ele) => {
                                 const cantidadColumnas = main.c.length;
                                 const cell = document.createElement('td');
-                                count++;
+                                countingCeldas++;
 
                                 /* Si es la celda de imagen y no es la cabecera de la tabla */
-                                if (count % cantidadColumnas == 0 && count > cantidadColumnas) {
+                                if ( countingCeldas % cantidadColumnas == 0 && countingCeldas > cantidadColumnas ) {
                                     if (ele.v !== null) {
                                         cell.innerHTML = "<img src=" + ele.v + ">";
                                     }
@@ -111,16 +107,18 @@
                                 container.append(cell);
                             })
                         })
+
                     })
                     .then(SelectCiudades => {
 
                         // Generar el Select de ciudades
                         // Si viene desde el select de Pais, ciudadElegida = ""
-                        if (ciudadElegida == "") {
+                        if (ciudadElegida == "" ) {
 
                             $('#ciudad ').find('option:not(:first-child)').remove().end();
 
                             if (paisElegido != "Todos") {
+
                                 let filas = $(".output tr");
                                 let ciudadCount = 0;
 
@@ -176,6 +174,8 @@
 
         })
     </script>
+
+    </div>
 </body>
 
 </html>
