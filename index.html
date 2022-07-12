@@ -23,167 +23,172 @@
             <span class="badge badge-primary">Bootstrap</span>
             <span class="badge badge-warning">Ajax</span>
         </p>
-    <div class="form" id="filtros">
-        <div class="form-row">
-        <select id="pais" class="col-6 col-md-3 form-control form-control-md">
-            <option value="Todos">Todos los Paises</option>
-            <option value="Argentina">Argentina</option>
-            <option value="Brasil">Brasil</option>
-            <option value="Chile">Chile</option>
-        </select>
-        <select id="ciudad" class="col-6 col-md-3 form-control form-control-md">
-            <option value="Todos">Todas las ciudades</option>
-        </select>
-    </div>
-    </div>
-    <table class="table output"></table>
+        <div class="form" id="filtros">
+            <div class="form-row">
+                <select id="pais" class="col-6 col-md-3 form-control form-control-md">
+                    <option value="Todos">Todos los Paises</option>
+                    <option value="Argentina">Argentina</option>
+                    <option value="Brasil">Brasil</option>
+                    <option value="Chile">Chile</option>
+                </select>
+                <select id="ciudad" class="col-6 col-md-3 form-control form-control-md">
+                    <option value="Todos">Todas las ciudades</option>
+                </select>
+            </div>
+        </div>
+        <table class="table output"></table>
 
-    <style>
-        tr:first-of-type {
-            font-weight: bold;
-        }
-
-        #filtros {
-            margin: 60px 0 30px 0;
-        }
-
-        #filtros select {
-            margin-right: 10px;
-        }
-    </style>
-
-
-    <script>
-        $(document).ready(function () {
-
-            const pais = document.querySelector("#pais");
-            const ciudad = document.querySelector("#ciudad");
-            let query = encodeURIComponent(`Select * `);
-            let paisElegido = "Todos";
-            let ciudadElegida = "";
-
-            fetchFunction(query, paisElegido);
-
-            function fetchFunction(query, paisElegido, ciudadElegida) {
-
-                const base = 'https://docs.google.com/spreadsheets/d/1U-zgC_zKCmsCIdWBz7YDKCmRZbHGw7_DdUhmKvI5s9A/gviz/tq?';
-                const output = document.querySelector('.output');
-                
-               /* Borrar todas las filas excepto la cabecera de la tabla*/                    
-               if ( paisElegido == "Todos"  ) {             
-                   $(".output tr").remove();
-                  // console.log ( 1 )
-                }
-                if ( ciudadElegida == "Todos" ) {             
-                    $(".output tr:not(:first)").remove();
-                   // console.log ( 2 )
-                }
-                if ( paisElegido != "Todos" &&  ciudadElegida != "Todos" ) {
-                    $(".output tr:not(:first)").remove();
-                  //  console.log ( 3 )
-                }
-               
-               let countingCeldas = 0;
-               /* Generar la url del Fetch */
-  
-                const url = base + '&tq=' + query;
-                fetch(url)
-                    .then(res => res.text())
-                    .then(rep => {
-                        const data = JSON.parse(rep.substr(47).slice(0, -2));
-
-                        data.table.rows.forEach((main) => {
-                            const container = document.createElement('tr');
-                            output.append(container);
-                            main.c.forEach((ele) => {
-                                const cantidadColumnas = main.c.length;
-                                
-                                const cell = document.createElement('td');
-                                countingCeldas++;
-                               // console.log( cantidadColumnas + "-" + countingCeldas ); 
-                                
-                                /* Si es la celda de imagen y no es la cabecera de la tabla */
-                                if ( countingCeldas % cantidadColumnas == 0 && countingCeldas > cantidadColumnas ) {
-                                  
-                                    if (ele.v !== null) {
-                                        cell.innerHTML = "<img src=" + ele.v + ">";
-                                    }
-                                }
-                                // Sino es celda de texto 
-                                else {
-                                    cell.innerHTML = ele.v;
-                                }
-
-                                container.append(cell);
-                            })
-                        })
-
-                    })
-                    .then(SelectCiudades => {
-
-                        // Generar el Select de ciudades
-                        // Si viene desde el select de Pais, ciudadElegida = ""
-                        if (ciudadElegida == "" ) {
-
-                            $('#ciudad ').find('option:not(:first-child)').remove().end();
-
-                            if (paisElegido != "Todos") {
-
-                                let filas = $(".output tr");
-                                let ciudadCount = 0;
-
-                                Array.from(filas).forEach(fila => {
-                                    ciudadCount++;
-                                    if (ciudadCount > 1) {
-                                        ciudadesDelPais = fila.querySelector('td').nextSibling;
-                                        let optionText = ciudadesDelPais.innerHTML;
-                                        let option = document.createElement('option');
-
-                                        // Compara <option> anterior y el siguiente para no repetir ciudades
-                                        if (optionText != $("#ciudad option:last-child").text()) {
-                                            option.value = optionText
-                                            option.text = optionText
-                                            ciudad.appendChild(option);
-                                        }
-                                    }
-                                })
-                            }
-                        }
-                    })
+        <style>
+            tr:first-of-type {
+                font-weight: bold;
             }
 
+            #filtros {
+                margin: 60px 0 30px 0;
+            }
 
-            //
-            // Filtrar por pais
-            //
-            pais.addEventListener('change', function (event) {
-                let paisElegido = event.target.value;
-                if (paisElegido == "Todos") {
-                    query = encodeURIComponent(`Select * `);
-                } else {
-                    query = encodeURIComponent(`Select * where A = "${paisElegido}"`);
+            #filtros select {
+                margin-right: 10px;
+            }
+        </style>
+
+
+        <script>
+            $(document).ready(function () {
+
+                const pais = document.querySelector("#pais");
+                const ciudad = document.querySelector("#ciudad");
+                let query = encodeURIComponent(`Select * `);
+                let paisElegido = "Todos";
+                let ciudadElegida = "";
+
+                fetchFunction(query, paisElegido);
+
+                function fetchFunction(query, paisElegido, ciudadElegida) {
+
+                    const base = 'https://docs.google.com/spreadsheets/d/1U-zgC_zKCmsCIdWBz7YDKCmRZbHGw7_DdUhmKvI5s9A/gviz/tq?';
+                    const output = document.querySelector('.output');
+
+                    /* Borrar todas las filas excepto la cabecera de la tabla*/
+                    if (paisElegido == "Todos") {
+                        $(".output tr").remove();
+                        // console.log ( 1 )
+                    }
+                    if (ciudadElegida == "Todos") {
+                        $(".output tr:not(:first)").remove();
+                        // console.log ( 2 )
+                    }
+                    if (paisElegido != "Todos" && ciudadElegida != "Todos") {
+                        $(".output tr:not(:first)").remove();
+                        //  console.log ( 3 )
+                    }
+
+                    let countingCeldas = 0;
+
+                    /* Generar la url del Fetch */
+
+                    const url = base + '&tq=' + query;
+                    fetch(url)
+                        .then(res => res.text())
+                        .then(rep => {
+                            const data = JSON.parse(rep.substr(47).slice(0, -2));
+
+                            // Que empiece en la segunda fila
+                            if (paisElegido != "Todos") {
+                                countingCeldas = 6;
+                            }
+                            data.table.rows.forEach((main) => {
+                                const container = document.createElement('tr');
+                                output.append(container);
+                                main.c.forEach((ele) => {
+                                    const cantidadColumnas = main.c.length;
+
+                                    const cell = document.createElement('td');
+                                    countingCeldas++;
+                                    // console.log( cantidadColumnas + "-" + countingCeldas ); 
+
+                                    if (countingCeldas % cantidadColumnas == 0 && countingCeldas > cantidadColumnas) {
+
+                                        if (ele.v !== null) {
+                                            cell.innerHTML = "<img src=" + ele.v + ">";
+                                        }
+                                    }
+                                    else {
+                                        cell.innerHTML = ele.v;
+                                    }
+
+
+
+                                    container.append(cell);
+                                })
+                            })
+
+                        })
+                        .then(SelectCiudades => {
+
+                            // Generar el Select de ciudades
+                            // Si viene desde el select de Pais, ciudadElegida = ""
+                            if (ciudadElegida == "") {
+
+                                $('#ciudad ').find('option:not(:first-child)').remove().end();
+
+                                if (paisElegido != "Todos") {
+
+                                    let filas = $(".output tr");
+                                    let ciudadCount = 0;
+
+                                    Array.from(filas).forEach(fila => {
+                                        ciudadCount++;
+                                        if (ciudadCount > 1) {
+                                            ciudadesDelPais = fila.querySelector('td').nextSibling;
+                                            let optionText = ciudadesDelPais.innerHTML;
+                                            let option = document.createElement('option');
+
+                                            // Compara <option> anterior y el siguiente para no repetir ciudades
+                                            if (optionText != $("#ciudad option:last-child").text()) {
+                                                option.value = optionText
+                                                option.text = optionText
+                                                ciudad.appendChild(option);
+                                            }
+                                        }
+                                    })
+                                }
+                            }
+                        })
                 }
-                ciudadElegida = "";
-                fetchFunction(query, paisElegido, ciudadElegida);
+
+
+                //
+                // Filtrar por pais
+                //
+                pais.addEventListener('change', function (event) {
+                    let paisElegido = event.target.value;
+                    if (paisElegido == "Todos") {
+                        query = encodeURIComponent(`Select * `);
+                    } else {
+                        query = encodeURIComponent(`Select * where A = "${paisElegido}"`);
+                    }
+                    ciudadElegida = "";
+                    fetchFunction(query, paisElegido, ciudadElegida);
+                })
+
+                //
+                // Filtrar por ciudad
+                //
+                ciudad.addEventListener('change', function (event) {
+                    let ciudadElegida = event.target.value;
+                    let paisElegido = document.querySelector("#pais").value;
+                    if (ciudadElegida != "Todos") {
+                        query = encodeURIComponent(`Select * where B = "${ciudadElegida}" `);
+                    } else {
+                        query = encodeURIComponent(`Select * where A = "${paisElegido}"`);
+                    }
+                    fetchFunction(query, paisElegido, ciudadElegida);
+                })
+
+
             })
-
-            //
-            // Filtrar por ciudad
-            //
-            ciudad.addEventListener('change', function (event) {
-                let ciudadElegida = event.target.value;
-                let paisElegido = document.querySelector("#pais").value;
-                if (ciudadElegida != "Todos") {
-                    query = encodeURIComponent(`Select * where B = "${ciudadElegida}" `);
-                } else {
-                    query = encodeURIComponent(`Select * where A = "${paisElegido}"`);
-                }
-                fetchFunction(query, paisElegido, ciudadElegida);
-            })
-
-
-        })
-    </script>
+        </script>
 
     </div>
 </body>
